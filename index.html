@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information Chatbot</title>
+    <style>
+        /* Resetting some default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Basic page styling */
+        body {
+            background-color: #f4f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        /* Container for chatbot */
+        #chatbot-container {
+            background-color: #fff;
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        h1 {
+            font-size: 1.8em;
+            color: #4a90e2;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4a90e2;
+        }
+
+        button[type="submit"] {
+            background-color: #4a90e2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #357abd;
+        }
+
+        /* User input display area */
+        #user-input {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+
+        #user-input p {
+            padding: 8px 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        /* Styling user and bot responses differently */
+        .user-message {
+            background-color: #e3f2fd;
+            text-align: right;
+            color: #333;
+        }
+
+        .bot-message {
+            background-color: #bbdefb;
+            text-align: left;
+            color: #333;
+        }
+
+        #user-input p strong {
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatbot-container">
+        <h1>Student Information Chatbot</h1>
+        <form id="user-input-form">
+            <label for="user">Enter your message:</label>
+            <input type="text" id="user" name="user" placeholder="Type a message...">
+            <button type="submit">Go</button>
+        </form>
+
+        <div id="user-input"></div>
+    </div>
+
+    <script>
+        document.getElementById('user-input-form').onsubmit = async function(event){
+            event.preventDefault();
+            const user = document.getElementById('user').value;
+            const studentInfoDiv = document.getElementById('user-input');
+            
+            // Display the user's message
+            const userMessage = document.createElement("p");
+            userMessage.className = "user-message";
+            userMessage.textContent = `User: ${user}`;
+            studentInfoDiv.appendChild(userMessage);
+
+            const response = await fetch('/get_response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `user=${encodeURIComponent(user)}`,
+            }).then(response => response.json());
+
+            if (response.success) {
+                // Create and append bot response
+                const botMessage = document.createElement("p");
+                botMessage.className = "bot-message";
+                
+                if (response.roll) {
+                    botMessage.innerHTML = `<strong>Roll Number:</strong> ${response.roll}`;
+                } else if (response.cgpa) {
+                    botMessage.innerHTML = `<strong>CGPA:</strong> ${response.cgpa}`;
+                } else if (response.contact) {
+                    botMessage.innerHTML = `<strong>Contact Number:</strong> ${response.contact}`;
+                } else if (response.year) {
+                    botMessage.innerHTML = `<strong>Year:</strong> ${response.year}`;
+                } else if (response.programme) {
+                    botMessage.innerHTML = `<strong>Programme:</strong> ${response.programme}`;
+                } else if (response.branch) {
+                    botMessage.innerHTML = `<strong>Branch:</strong> ${response.branch}`;
+                } else if (response.name) {
+                    botMessage.innerHTML = `<strong>Student Name:</strong> ${response.name}`;
+                } else if (response.data.PRNno) {
+                    botMessage.innerHTML = `
+                        <strong>PRN:</strong> ${response.data.PRNno}<br>
+                        <strong>Name:</strong> ${response.data.StudentName}<br>
+                        <strong>Programme:</strong> ${response.data.Programme}<br>
+                        <strong>Current Year:</strong> ${response.data.Year}<br>
+                        <strong>Grade:</strong> ${response.data.CGPA}<br>
+                        <strong>Roll Number:</strong> ${response.data.RollNumber}<br>
+                        <strong>Contact Number:</strong> ${response.data.Contactnumber}<br>
+                        <strong>Branch:</strong> ${response.data.Branch}`;
+                } else {
+                    botMessage.textContent = response.data.Response;
+                }
+
+                studentInfoDiv.appendChild(botMessage);
+            } else {
+                response.forEach(entry => {
+                    const errorMessage = document.createElement("p");
+                    errorMessage.className = "bot-message";
+                    errorMessage.textContent = entry.message;
+                    studentInfoDiv.appendChild(errorMessage);
+                });
+            }
+
+            // Clear the input field
+            document.getElementById('user').value = '';
+            // Scroll to the latest message
+            studentInfoDiv.scrollTop = studentInfoDiv.scrollHeight;
+        };
+    </script>
+</body>
+</html>
