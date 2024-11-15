@@ -12,6 +12,9 @@ To run this application :
 2) Activate the environment
 3) Store all the files in the folder containing the env folder.
 4) Run the flask application using (flask run) command in the terminal.
+
+![image](https://github.com/user-attachments/assets/018ba760-6a23-4ecc-a302-62981e75155c)
+
    
 File structure : 
 project_folder/
