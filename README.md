@@ -14,21 +14,3 @@ To run this application :
 4) Run the flask application using (flask run) command in the terminal.
 
 ![image](https://github.com/user-attachments/assets/018ba760-6a23-4ecc-a302-62981e75155c)
-
-   
-File structure : 
-project_folder/
-├── env/                      # Virtual environment folder
-│   ├── bin/                  # Executables
-│   ├── include/              # C header files
-│   ├── lib/                  # Libraries
-│   └── ...                   # Other virtual environment files
-│
-├── template/                 # Template folder
-│   └── index.html            # HTML template file
-│
-├── app.py                    # Main application file
-├── student_data.xlsx         # Excel file with student data
-├── Student_Query.xlsx        # Excel file with student query data
-├── Query_Response.xlsx       # Excel file with query and response data
-└── requirements.txt          # List of dependencies
